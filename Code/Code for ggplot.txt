@@ -1,0 +1,11 @@
+data <- read.csv("/home/jiahuang/Dropbox/Princeton/Sophomore Summer/Summer Project/Code/Data/Simulation5.csv")
+
+q1 <- ggplot(data, aes(x = Recall, y = Precision)) + geom_point()
+
+q1 + scale_x_continuous(name = "Recall",
+                       limits = c(0.0, 1.0),
+                       breaks = seq(0.0, 1.0, by = 0.2)) +
+     scale_y_continuous(name = "Precision",
+                       limits = c(0.0, 1.0),
+                       breaks = seq(0.0, 1.0, by = 0.2)) +
+     ggtitle("Simulation 5: 10 individuals, 3 isoforms, 4 gene loci")
