@@ -14,7 +14,7 @@ def generate_data(n, maf, K):
 def generate_gene_data(n, maf):
 	"""Generates the gene data for n people. 
 
-	   E.g.
+       E.g.
 	   Suppose n=100 and maf = 0.1.
 	   Then total number of alleles = 200 while total number of minor alleles is about 20.
 
