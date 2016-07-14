@@ -7,9 +7,9 @@ import scipy.special as special
 import MultivariateBeta as mb
 import math
 
-y_1 = 0.58
-y_2 = 0.42
-sigma = 1
+y_1 = 0.0001
+y_2 = 0.9999
+sigma = 1.0
 
 def integrand(y, x):
 	beta_input = [math.exp(x), math.exp(y)]
@@ -29,9 +29,9 @@ def func_g(y, x):
 
 	return beta_func * first_y * sec_y
 
-#result = integrate.dblquad(integrand, -6, 6, lambda x: -6, lambda x: 6)
+result = integrate.dblquad(integrand, -6, 6, lambda x: -6, lambda x: 6)
 
-#print("From integration     : " + str(result))
+print("From integration     : " + str(result))
 
 def mc(n):
 	summation = 0
@@ -41,7 +41,7 @@ def mc(n):
 		summation = summation + func_g(y, x)
 	return summation/n
 
-#print("Mean from MC         : " + str(mc(100000)))
+print("Mean from MC         : " + str(mc(100000)))
 
 
 

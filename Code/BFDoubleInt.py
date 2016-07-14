@@ -3,8 +3,8 @@ import scipy.integrate as integrate
 import scipy.special as special
 import math
 
-y_1 = 0.58
-y_2 = 0.42
+y_1 = 0.02
+y_2 = 0.98
 sigma = 1
 
 def integrand(y, x):
@@ -17,6 +17,6 @@ def integrand(y, x):
 
 	return gamma_top * first_y * sec_y * exp_1 * exp_2 / (2 * math.pi * gamma_bot * (sigma**2) * x * y)
 
-result = integrate.dblquad(integrand, 0, 70, lambda x: 0, lambda x: 70)
+result = integrate.dblquad(integrand, 0, 80, lambda x: 0, lambda x: 80)
 
 print(result)
