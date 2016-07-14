@@ -1,3 +1,6 @@
+"""MCMC calculate Bayesfactor, for checking with Laplace approximation
+"""
+
 import sys
 sys.path.insert(0, '/home/jiahuang/Dropbox/Princeton/Sophomore Summer/Summer Project/Summer2016/Code')
 
@@ -10,6 +13,14 @@ numOfTrials = 100000
 Sigma_0 = 1
 Sigma_1 = 1
 test_position = 0 #0 to 3
+
+y_1 = 0.001
+y_2 = 0.234
+y_3 = 0.676
+y_4 = 1.0 - y_1 - y_2 - y_3
+
+generated_data_inputX = [[1, 0, 0, 1]]
+generated_data_inputY = [[y_1, y_2, y_3, y_4]]
 
 def integrand_beta(inputEta):
 	"""Returns the product of the 1/B() term in the integral
@@ -97,8 +108,5 @@ def bayes_factor(inputX, inputY):
 	print("Numerator:    ", numerator)
 	print("Denominator:  ", denominator)
 	print("Bayes Factor: ", numerator/denominator)
-
-generated_data_inputX = [[1, 0]]
-generated_data_inputY = [[0.1, 0.9]]
 bayes_factor(generated_data_inputX, generated_data_inputY)
 

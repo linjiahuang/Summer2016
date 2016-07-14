@@ -1,3 +1,7 @@
+"""Implemented the Laplace approximation in integrating a 2D function. 
+   Contains both the Hessian from numdifftools and from closed form solution
+"""
+
 import sys
 sys.path.insert(0, '/home/jiahuang/Dropbox/Princeton/Sophomore Summer/Summer Project/Summer2016/Code')
 
@@ -108,6 +112,11 @@ H = nd.Hessian(objective_r)(res.x, *args)
 print(H)
 print("--------------------------")
 """
+
+
+
+
+"""
 matrix_r = np.array([[matrix_one_one(res.x, *args), matrix_other_entry(res.x, *args)], [matrix_other_entry(res.x, *args), matrix_two_two(res.x, *args)]])
 
 def result_of_laplace_method(input_value, *args):
@@ -118,6 +127,9 @@ def result_of_laplace_method(input_value, *args):
 print("Result from Laplace method is: ")
 print(result_of_laplace_method(res.x, *args))
 print("---------------------------------------")
+"""
+
+
 
 
 """
