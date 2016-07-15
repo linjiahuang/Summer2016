@@ -7,7 +7,13 @@ sigma_1 = 1.5              #std dev for eta
 beta_0k = [2.0, 1.5, 1.0]  #intercept
 
 def generate_correlated_data(gene_data, sigma_0, sigma_1, beta_0k):
-	"""Incomplete
+	"""Generates the K isoform proportions for n individuals, for use in the alternative hypothesis.
+	   First creates a 1 by K list containing the effect.
+	   Then creates an n by K list containing epsilon, the noise.
+	   Then creates an n by K list containing eta, the Dirichlet pdf parameters.
+	   Then use those parameters to generate the isoform proportions, according to the equation in the write-up.
+
+	   Returns an n by K list of isoform proportions such that for each individual, the K isoforms sum to 1.0.
 	"""
 	n = len(gene_data) #number of individuals
 	K = len(beta_0k)   #number of isoforms
