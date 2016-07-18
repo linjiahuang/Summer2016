@@ -1,3 +1,6 @@
+"""Implements variance reduction by using just one sample for both the numerator and denominator
+"""
+
 import sys
 sys.path.insert(0, '/home/jiahuang/Dropbox/Princeton/Sophomore Summer/Summer Project/Summer2016/Code')
 

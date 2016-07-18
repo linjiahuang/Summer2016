@@ -1,10 +1,11 @@
 import numpy as np
 import math
 
+
 #hyper-parameters for testing purposes
 sigma_0 = 1                #std dev for beta
 sigma_1 = 1.5              #std dev for eta
-beta_0k = [2.0, 1.5, 1.0]  #intercept
+beta_0k = [2.0, 1.5, 1.0, 1.1]  #intercept
 
 def generate_correlated_data(gene_data, sigma_0, sigma_1, beta_0k):
 	"""Generates the K isoform proportions for n individuals, for use in the alternative hypothesis.
@@ -54,7 +55,7 @@ def generate_random_data(n, K):
 	for j in range(0, n):
 		eta = [] #1 by K list
 		for k in range(0, K):
-			eta.append(np.random.lognormal(0, sigma_1))
+			eta.append(np.random.lognormal(beta_0k[k], sigma_1))
 		Eta.append(eta)
 
 	Isoform = [] #n by K list
@@ -70,22 +71,28 @@ def generate_gene_data(n, maf):
 	   Suppose n=100 and maf=0.1.
 	   Then total number of alleles=200 while total number of minor alleles is about 20.
 
-       Given n, create a list of length n. For each entry in list, generate 2 random numbers independently and 
-       uniformly in [0, 1]. The zygosity of this entry is equal to (random1 < maf) + (random2 < maf).
-
        Returns a list of length n with entries 0, 1 or 2.
 	"""
-	gene_data = []
+	x = np.random.binomial(2,maf,n)
+	# ensures that x contains all 3 types of data (i.e. 0, 1 and 2)
+	while (len(np.where(x==0)[0])*len(np.where(x==1)[0])*len(np.where(x==2)[0])==0):
+		x =  np.random.binomial(2,maf,n)
+	return x
+
+def print_data(n, K, maf, sigma_0, sigma_1, beta_0k):
+	gene_data = generate_gene_data(n, maf)
+	correlated_data = generate_correlated_data(gene_data, sigma_0, sigma_1, beta_0k)
+
 	for i in range(0, n):
-		random1 = np.random.uniform()
-		random2 = np.random.uniform()
-		gene_data.append((random1 < maf) + (random2 < maf)) #code detail: note that in python (True) + (True) = 2
-	return gene_data
+		print(gene_data[i], end='\t')
+		for k in range(0, K):
+			print(correlated_data[i][k], end='\t')
+		print()
 
-gene_data = generate_gene_data(5, 0.7)
+print_data(4, 4, 0.1, sigma_0, sigma_1, beta_0k)
 
-print(gene_data)
-print(generate_correlated_data(gene_data, sigma_0, sigma_1, beta_0k))
+
+
 
 
 

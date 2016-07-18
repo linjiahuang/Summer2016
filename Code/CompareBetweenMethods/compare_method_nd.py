@@ -12,13 +12,11 @@ import numdifftools as nd
 # Global constants
 n = 100000.0 # for use in Laplace approximation
 sigma = 1.0
-y_1 = 0.001
-y_2 = 0.234
-y_3 = 0.676
-y_4 = 1.0 - y_1 - y_2 - y_3
+y_1 = 0.1
+y_2 = 1- y_1
 
-input_value = [0.06076677,  0.47356138, 0.341, 0.111]
-args = (y_1, y_2, y_3, y_4)
+input_value = [0.06076677,  0.47356138]
+args = (y_1, y_2)
 
 def objective_r(input_value, *args):
 	mu = [] # Dirichlete pdf Parameters (exp)
