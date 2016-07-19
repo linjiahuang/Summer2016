@@ -1,0 +1,19 @@
+library(ggplot2)
+
+sim_scatter <- read.delim("/home/jiahuang/Dropbox/Princeton/Sophomore Summer/Summer Project/Summer2016/Code/ggplot_test.txt", header = FALSE)
+
+colnames(sim_scatter)[1] <- "genotype"
+for (i in 1:(ncol(sim_scatter)-1)) {
+	colnames(sim_scatter)[i+1] <- paste("y_", i, sep='')
+}
+sim_scatter$genotype[sim_scatter$genotype == 0] <- "AA"
+sim_scatter$genotype[sim_scatter$genotype == 1] <- "Aa"
+sim_scatter$genotype[sim_scatter$genotype == 2] <- "aa"
+
+g <- ggplot(sim_scatter, aes(genotype, y_1, color=factor(genotype))) + scale_color_manual(values=c("lightseagreen", "darkorange1","lightslateblue"))
+g <- g + xlab("genotype") + ylab("phenotype") 
+g <- g + geom_jitter(width = 0.1, height = 0)
+
+
+print(sim_scatter)
+

@@ -1,11 +1,10 @@
 import numpy as np
 import math
 
-
 #hyper-parameters for testing purposes
 sigma_0 = 1                #std dev for beta
 sigma_1 = 1.5              #std dev for eta
-beta_0k = [2.0, 1.5, 1.0, 1.1]  #intercept
+beta_0k = [2.0, 1.5, 1.0]  #intercept
 
 def generate_correlated_data(gene_data, sigma_0, sigma_1, beta_0k):
 	"""Generates the K isoform proportions for n individuals, for use in the alternative hypothesis.
@@ -85,11 +84,11 @@ def print_data(n, K, maf, sigma_0, sigma_1, beta_0k):
 
 	for i in range(0, n):
 		print(gene_data[i], end='\t')
-		for k in range(0, K):
+		for k in range(0, K-1):
 			print(correlated_data[i][k], end='\t')
-		print()
+		print(correlated_data[i][K-1])
 
-print_data(4, 4, 0.1, sigma_0, sigma_1, beta_0k)
+print_data(6, 3, 0.1, sigma_0, sigma_1, beta_0k)
 
 
 
