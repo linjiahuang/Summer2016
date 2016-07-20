@@ -9,9 +9,9 @@ import MultivariateBeta as mb
 import math
 import numdifftools as nd
 
-y_11 = 0.1
+y_11 = 0.5
 y_12 = 1.0 - y_11
-y_21 = 0.4
+y_21 = 0.5
 y_22 = 1.0 - y_21
 sigma = 1.0
 n = 100000.0
@@ -65,9 +65,6 @@ def integrand(mu_22, mu_21, mu_12, mu_11):
 #print(result)
 
 
-
-input_value = [0.1, 0.4, 0.5, 0.6]
-args = (n, 1.1)
 # for use with Laplace method (without manually integrating beta_0k)
 def objective_rr(input_value, *args):
 
@@ -99,18 +96,18 @@ def objective_rr(input_value, *args):
 def objective_r(input_value, *args):
 
 	mu_22, mu_21, mu_12, mu_11 = input_value
-
+	"""
 	beta_input1 = [math.exp(mu_11), math.exp(mu_12)]
 	beta_input2 = [math.exp(mu_21), math.exp(mu_22)]
-
-	beta_func1 = mb.multivariateBeta(beta_input1)
-	beta_func2 = mb.multivariateBeta(beta_input2)
+	
+	beta_func1 = 1.0/(special.beta(math.exp(mu_11), math.exp(mu_12)))
+	beta_func2 = 1.0/(special.beta(math.exp(mu_21), math.exp(mu_22)))
 
 	exp_y_11 = y_11 ** (math.exp(mu_11) - 1.0)
 	exp_y_12 = y_12 ** (math.exp(mu_12) - 1.0)
 	exp_y_21 = y_21 ** (math.exp(mu_21) - 1.0)
 	exp_y_22 = y_22 ** (math.exp(mu_22) - 1.0)
-
+	
 	exp_11 = math.exp(-mu_11**2 / 2.0)
 	exp_12 = math.exp(-mu_21**2 / 2.0)
 	exp_21 = math.exp(-mu_12**2 / 2.0)
@@ -118,12 +115,36 @@ def objective_r(input_value, *args):
 
 	exp_1 = math.exp(((mu_11 + mu_21)/2.0)**2)
 	exp_2 = math.exp(((mu_12 + mu_22)/2.0)**2)
+	"""
 
-	return -1.0 * (1.0/n) * math.log(beta_func1 * beta_func2 * exp_y_11 * exp_y_12 * exp_y_21 * exp_y_22 * exp_1 * exp_2 / (4 * math.pi * sigma**4))
+	log_beta_func1 = -special.betaln(math.exp(mu_11), math.exp(mu_12))
+	log_beta_func2 = -special.betaln(math.exp(mu_21), math.exp(mu_22))
+
+	log_exp_y_11 = math.log(y_11) * (math.exp(mu_11) - 1.0)
+	log_exp_y_12 = math.log(y_12) * (math.exp(mu_12) - 1.0)
+	log_exp_y_21 = math.log(y_21) * (math.exp(mu_21) - 1.0)
+	log_exp_y_22 = math.log(y_22) * (math.exp(mu_22) - 1.0)
+
+	log_exp_11 = -mu_11**2 / 2.0
+	log_exp_12 = -mu_21**2 / 2.0
+	log_exp_21 = -mu_12**2 / 2.0
+	log_exp_22 = -mu_22**2 / 2.0
+
+	log_exp_1 = ((mu_11 + mu_21)/2.0)**2
+	log_exp_2 = ((mu_12 + mu_22)/2.0)**2
+
+	return -1.0 * (1.0/n) * (log_beta_func1 + log_beta_func2 + log_exp_y_11 + log_exp_y_12 + log_exp_y_21 + log_exp_y_22 + log_exp_1 + log_exp_2 - math.log(4 * math.pi * sigma**4))
+
+
+input_value = [5, 5, 5, 5]
+args = (n, 1.1)
+
+#print(objective_r(input_value, *args))
 
 res = minimize(objective_r, input_value, args=args, method='Nelder-Mead', tol=1e-12)
-#H = nd.Hessian(objective_r)(res.x, *args)
 print(res)
+H = nd.Hessian(objective_r)(res.x, *args)
+print(np.linalg.det(H))
 
 def result_of_laplace_method(input_value, *args):
 	mu_22, mu_21, mu_12, mu_11 = input_value
@@ -131,3 +152,5 @@ def result_of_laplace_method(input_value, *args):
 	return (2 * math.pi / n)**2 * math.sqrt(1.0 / np.linalg.det(H)) * math.exp(-1.0 * n * objective_r(res.x, *args)) 
 
 #print(result_of_laplace_method(res.x, *args))
+
+

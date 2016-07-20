@@ -9,7 +9,7 @@ def multivariateBeta(inputEta):
 
 	currProduct = 1
 	for i in range(1, n):
-		value  = special.beta(currSum,inputEta[i])
+		value = special.beta(currSum,inputEta[i])
 		"""
 		if (value < 0.00000001):
 			value = 0.00000001
@@ -21,8 +21,28 @@ def multivariateBeta(inputEta):
 
 	return currProduct
 
+def multivariateLogBeta(inputEta):
+	"""Calculate the natural log of multivariate
+	"""
+	currSum = inputEta[0]
+	n = len(inputEta)
+
+	currValue = 0
+	for i in range(1, n):
+		value = -special.betaln(currSum,inputEta[i])
+		"""
+		if (value < 0.00000001):
+			value = 0.00000001
+		if (value > 1000000000):
+			value = 1000000000
+		"""
+		currValue = currValue + value
+		currSum = currSum + inputEta[i]
+
+	return currValue
+
 """
-inputEta = [10, 3]
+inputEta = [10, 3, 2, 6, 8]
 
 def compBeta(inputEta):
 	#Function to test if my multivariateBeta is implemented correctly
@@ -40,4 +60,6 @@ def compBeta(inputEta):
 
 print(multivariateBeta(inputEta))
 print(compBeta(inputEta))
+print(math.log(compBeta(inputEta)))
+print(multivariateLogBeta(inputEta))
 """
