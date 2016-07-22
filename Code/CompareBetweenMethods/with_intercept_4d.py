@@ -52,17 +52,21 @@ def integrand(mu_22, mu_21, mu_12, mu_11):
 	exp_y_21 = y_21 ** (math.exp(mu_21) - 1.0)
 	exp_y_22 = y_22 ** (math.exp(mu_22) - 1.0)
 
-	exp_11 = math.exp(-mu_11**2 / 2.0)
-	exp_12 = math.exp(-mu_12**2 / 2.0)
-	exp_21 = math.exp(-mu_21**2 / 2.0)
-	exp_22 = math.exp(-mu_22**2 / 2.0)
+	exp_1 = math.exp(-((mu_11 - mu_21)/2.0)**2)
+	exp_2 = math.exp(-((mu_12 - mu_22)/2.0)**2)
 
-	exp_1 = math.exp(((mu_11 + mu_21)/2.0)**2)
-	exp_2 = math.exp(((mu_12 + mu_22)/2.0)**2)
-
-	return beta_func1 * beta_func2 * exp_y_11 * exp_y_12 * exp_y_21 * exp_y_22 * exp_11 * exp_12 * exp_21 * exp_22 * exp_1 * exp_2 / (4 * math.pi * sigma**4)
+	return beta_func1 * beta_func2 * exp_y_11 * exp_y_12 * exp_y_21 * exp_y_22 * exp_1 * exp_2 / (4 * math.pi * sigma**4)
 #result = integrate.nquad(integrand, [[-5, 3],[-5, 3],[-5, 3],[-5, 3]])
 #print(result)
+
+num_trial = 100000
+
+for i in range(0, num_trial):
+	result = 0
+	mu = np.random.uniform(-5, 5, 4)
+	result = result + integrand(mu[0], mu[1], mu[2], mu[3])
+
+print(result/num_trial)
 
 
 # for use with Laplace method (without manually integrating beta_0k)
@@ -125,13 +129,8 @@ def objective_r(input_value, *args):
 	log_exp_y_21 = math.log(y_21) * (math.exp(mu_21) - 1.0)
 	log_exp_y_22 = math.log(y_22) * (math.exp(mu_22) - 1.0)
 
-	log_exp_11 = -mu_11**2 / 2.0
-	log_exp_12 = -mu_21**2 / 2.0
-	log_exp_21 = -mu_12**2 / 2.0
-	log_exp_22 = -mu_22**2 / 2.0
-
-	log_exp_1 = ((mu_11 + mu_21)/2.0)**2
-	log_exp_2 = ((mu_12 + mu_22)/2.0)**2
+	log_exp_1 = -((mu_11 - mu_21)/2.0)**2
+	log_exp_2 = -((mu_12 - mu_22)/2.0)**2
 
 	return -1.0 * (1.0/n) * (log_beta_func1 + log_beta_func2 + log_exp_y_11 + log_exp_y_12 + log_exp_y_21 + log_exp_y_22 + log_exp_1 + log_exp_2 - math.log(4 * math.pi * sigma**4))
 
@@ -141,10 +140,10 @@ args = (n, 1.1)
 
 #print(objective_r(input_value, *args))
 
-res = minimize(objective_r, input_value, args=args, method='Nelder-Mead', tol=1e-12)
-print(res)
-H = nd.Hessian(objective_r)(res.x, *args)
-print(np.linalg.det(H))
+#res = minimize(objective_r, input_value, args=args, method='powell', tol=1e-12)
+#print(res)
+#H = nd.Hessian(objective_r)(res.x, *args)
+#print(np.linalg.det(H))
 
 def result_of_laplace_method(input_value, *args):
 	mu_22, mu_21, mu_12, mu_11 = input_value

@@ -9,7 +9,7 @@ import MultivariateBeta as mb
 import math
 import numdifftools as nd
 
-y_1 = 0.1
+y_1 = 0.04
 y_2 = 1.0 - y_1
 sigma = 1.0
 
