@@ -1,0 +1,9 @@
+Values used for beta_0k(intercept). Sampled from -1.0 to 1.0 uniformly:
+   1	0.9097836347
+   2	-0.6346097571
+   3	-0.0855193701
+
+Values used for beta_k(effect). Sampled from normal with mean 0 and std 1.0:
+   1	1.2981323663
+   2	0.0154190051
+   3	-0.5675512146

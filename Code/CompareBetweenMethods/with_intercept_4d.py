@@ -59,6 +59,7 @@ def integrand(mu_22, mu_21, mu_12, mu_11):
 #result = integrate.nquad(integrand, [[-5, 3],[-5, 3],[-5, 3],[-5, 3]])
 #print(result)
 
+"""
 num_trial = 100000
 
 for i in range(0, num_trial):
@@ -67,7 +68,7 @@ for i in range(0, num_trial):
 	result = result + integrand(mu[0], mu[1], mu[2], mu[3])
 
 print(result/num_trial)
-
+"""
 
 # for use with Laplace method (without manually integrating beta_0k)
 def objective_rr(input_value, *args):
@@ -152,4 +153,16 @@ def result_of_laplace_method(input_value, *args):
 
 #print(result_of_laplace_method(res.x, *args))
 
+def f(input_value, *args):
+	x, y = input_value
+	a, b = args
+	first_term = 1.0/special.beta(x, y)
+	second_term = a**(x-1) * b**(y-1)
+	return first_term * second_term
+
+input_value = [4, 5]
+args = (0.4, 0.6)
+
+res = minimize(f, input_value, args=args, method='Nelder-Mead', tol=1e-12)
+print(res)
 

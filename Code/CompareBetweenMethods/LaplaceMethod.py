@@ -23,7 +23,7 @@ x = 2.0
 
 sigma_0 = 1.0
 sigma_1 = 1.0
-beta_0k = [0.2, 0.7, 0.5]
+beta_0k = [0.5, 0.4, -0.5, -0.1]
 
 def objective_r_denom(input_value, *args):
 	mu = [] # Dirichlete pdf Parameters (exp)
@@ -108,7 +108,7 @@ def bayes_factor(y, x):
 	print("Bayes Factor is : ", BF)
 
 for i in range(0, 10):
-	generated_data = gd.print_data(60, 3, 0.1, sigma_0, sigma_1, beta_0k)
+	generated_data = gd.print_data(100, 4, 0.1, sigma_0, sigma_1, beta_0k)
 	print("Correlated:")
 	bayes_factor(generated_data[2], generated_data[0])
 	print("Random    :")
