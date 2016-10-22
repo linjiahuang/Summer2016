@@ -66,6 +66,15 @@ def generate_correlated_data(gene_data, beta_0k, beta_k, epsilon_j_k):
 	for j in range(0, n):
 		eta = [] #1 by K list
 		for k in range(0, K):
+			"""
+			print(eta)
+			print(beta_0k[k])
+			print(gene_data[j])
+			print(beta_k[k])
+			print(epsilon_j_k[j][k])
+			print("i")
+			print(math.exp(beta_0k[k] + gene_data[j]*beta_k[k] + epsilon_j_k[j][k]))
+			"""
 			eta.append(math.exp(beta_0k[k] + gene_data[j]*beta_k[k] + epsilon_j_k[j][k]))
 		Eta.append(eta)
 
@@ -75,7 +84,7 @@ def generate_correlated_data(gene_data, beta_0k, beta_k, epsilon_j_k):
 		Isoform.append((np.random.dirichlet(arrayEta).tolist()))
 	return Isoform
 
-def generate_random_data(n, K, beta_0k):
+def generate_random_data(beta_0k, epsilon_j_k):
 	"""Generates the K isoform proportions for n individuals, for use in the null hypothesis.
 	   First creates an n by K list containing eta, the Dirichlet pdf parameters
 	   Then use those parameters to generate the isoform proportions.
@@ -83,11 +92,14 @@ def generate_random_data(n, K, beta_0k):
 
 	   Returns a n by K list of isoform proportions such that for each individual, the K isoforms sum to 1.0.
 	"""
+	n = len(epsilon_j_k)
+	K = len(beta_0k)
+
 	Eta = [] #n by K list 
 	for j in range(0, n):
 		eta = [] #1 by K list
 		for k in range(0, K):
-			eta.append(np.random.lognormal(beta_0k[k], sigma_1))
+			eta.append(math.exp(beta_0k[k] + epsilon_j_k[j][k]))
 		Eta.append(eta)
 
 	Isoform = [] #n by K list
@@ -97,10 +109,10 @@ def generate_random_data(n, K, beta_0k):
 	return Isoform
 
 def create_folders():
-	directory = '/home/jiahuang/Dropbox/Princeton/Sophomore Summer/Summer Project/Summer2016/Simulation Result'
-	n = [10, 100, 500]
+	directory = '/home/jiahuang/Dropbox/Princeton/Sophomore Summer/Summer Project/Summer2016/New Simulation Result'
+	n = [10, 100]
 	maf = [0.05, 0.1, 0.2]
-	K = [3, 10, 100]
+	K = [3, 5]
 
 	for n_item in n:
 		for maf_item in maf:
@@ -108,16 +120,14 @@ def create_folders():
 				new_directory = directory + '/file_n=' + str(n_item) + '-maf=' + str(int(maf_item * 100)) + '-K=' + str(K_item) 
 				os.mkdir(new_directory)
 
-
-def print_data(trial_number, n, K, maf):
+#For 2 files(null and alternative) in 1 folder
+def print_data(trial_number, n, K, maf, beta_0k, beta_k):
 	#generate appropriate data
 	gene_data = generate_gene_data(n, maf)
-	beta_0k = generate_beta_0k(lower_bound, upper_bound, K)
-	beta_k = generate_beta_k(sigma_0, K)
 	epsilon_j_k = generate_epsilon_j_k(sigma_1, n, K)
 	Isoform = generate_correlated_data(gene_data, beta_0k, beta_k, epsilon_j_k)
 
-	filepath = '/home/jiahuang/Dropbox/Princeton/Sophomore Summer/Summer Project/Summer2016/Simulation Result/file_n=' + str(n) + '-maf=' + str(int(maf * 100)) + '-K=' + str(K) + '/'
+	filepath = '/home/jiahuang/Dropbox/Princeton/Sophomore Summer/Summer Project/Summer2016/New Simulation Result/file_n=' + str(n) + '-maf=' + str(int(maf * 100)) + '-K=' + str(K) + '/'
 
 	#open file for simulation
 	maf_formated = maf * 100
@@ -133,56 +143,52 @@ def print_data(trial_number, n, K, maf):
 		simulation.write('\n')
 	simulation.close()
 
-	#shuffles for permutation
-	shuffle(Isoform)
+	epsilon_j_k = generate_epsilon_j_k(sigma_1, n, K)
+	nullIsoform = generate_random_data(beta_0k, epsilon_j_k)
 
-	#opens file for permutation
-	filename_permutation = 'permutation' + str(trial_number) + '_n=' + str(n) + '-maf=' + str(int(maf_formated)) + '-K=' + str(K) + '.txt'
-	permutation = open(filepath + filename_permutation, 'w')
+	#opens file for null hypothesis simulation
+	filename_nullSimulation = 'nullSimulation' + str(trial_number) + '_n=' + str(n) + '-maf=' + str(int(maf_formated)) + '-K=' + str(K) + '.txt'
+	nullSimulation = open(filepath + filename_nullSimulation, 'w')
 	for i in range(0, n):
-		permutation.write('{0:1d}'.format(gene_data[i]))
-		permutation.write('\t')
+		nullSimulation.write('{0:1d}'.format(gene_data[i]))
+		nullSimulation.write('\t')
 		for k in range(0, K-1):
-			permutation.write('{0:.10f}'.format(Isoform[i][k]))
-			permutation.write('\t')
-		permutation.write('{0:.10f}'.format(Isoform[i][K-1]))
-		permutation.write('\n')
-	permutation.close()
-
-	#opens files for specification
-	#as of now only specifies intercept and effect, not noise
-	filename_specification = 'specification' + str(trial_number) + '_n=' + str(n) + '-maf=' + str(int(maf_formated)) + '-K=' + str(K) + '.txt'
-	specification = open(filepath + filename_specification, 'w')
-	specification.write('Values used for beta_0k(intercept). Sampled from {0} to {1} uniformly:\n'.format(lower_bound, upper_bound))
-	for k in range(0, K):
-		specification.write('{0:4d}\t{1:.10f}'.format(k+1, beta_0k[k]))
-		specification.write('\n')
-	specification.write('\n')
-	specification.write('Values used for beta_k(effect). Sampled from normal with mean 0 and std {0}:\n'.format(sigma_0))
-	for k in range(0, K):
-		specification.write('{0:4d}\t{1:.10f}'.format(k+1, beta_k[k]))
-		specification.write('\n')
-	specification.close()
-	"""
-	for i in range(0, n):
-		print('{0:1d}'.format(gene_data[i]), end='\t')
-		for k in range(0, K-1):
-			print('{0:.10f}'.format(Isoform[i][k]), end='\t')
-		print('{0:.10f}'.format(Isoform[i][K-1]))
-	"""
+			nullSimulation.write('{0:.10f}'.format(nullIsoform[i][k]))
+			nullSimulation.write('\t')
+		nullSimulation.write('{0:.10f}'.format(nullIsoform[i][K-1]))
+		nullSimulation.write('\n')
+	nullSimulation.close()
 
 def print_all_data():
-	n = [10, 100, 500]
+	n = [10, 100]
 	maf = [0.05, 0.1, 0.2]
-	K = [3, 10, 100]
+	K = [3, 5]
 
 	for n_item in n:
 		for maf_item in maf:
 			for K_item in K:
+				#generate the intercept value (beta_0k) and the effect value (beta_k)
+				beta_0k = generate_beta_0k(lower_bound, upper_bound, K_item)
+				beta_k = generate_beta_k(sigma_0, K_item)
+				#opens files for specification
+				maf_formated = maf_item * 100
+				filepath = '/home/jiahuang/Dropbox/Princeton/Sophomore Summer/Summer Project/Summer2016/New Simulation Result/file_n=' + str(n_item) + '-maf=' + str(int(maf_item * 100)) + '-K=' + str(K_item) + '/'
+				filename_specification = 'specification' + '_n=' + str(n_item) + '-maf=' + str(int(maf_formated)) + '-K=' + str(K_item) + '.txt'
+				specification = open(filepath + filename_specification, 'w')
+				specification.write('Values used for beta_0k(intercept). Sampled from {0} to {1} uniformly:\n'.format(lower_bound, upper_bound))
+				for k in range(0, K_item):
+					specification.write('{0:4d}\t{1:.10f}'.format(k+1, beta_0k[k]))
+					specification.write('\n')
+				specification.write('\n')
+				specification.write('Values used for beta_k(effect). Sampled from normal with mean 0 and std {0}:\n'.format(sigma_0))
+				for k in range(0, K_item):
+					specification.write('{0:4d}\t{1:.10f}'.format(k+1, beta_k[k]))
+					specification.write('\n')
+				specification.close()
 				for i in range(0, 500):
-					print_data(i+1, n_item, K_item, maf_item)
+					print_data(i+1, n_item, K_item, maf_item, beta_0k, beta_k)
 
-#create_folders()
+create_folders()
 print_all_data()
 
 
