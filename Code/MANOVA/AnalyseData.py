@@ -72,11 +72,11 @@ def getFScore(filename, n, K):
 	return [F_original, F_permuted]
 
 #Tested on Oct 22 and worked
-def printFScore(n, K, maf):
+def printFScore(n, K, maf, directory):
 	simulation_result = []
 
 	for trial_number in range(1, 501):
-		filepath = '/home/jiahuang/Dropbox/Princeton/Sophomore Summer/Summer Project/Summer2016/New Simulation Result/file_n=' + str(n) + '-maf=' + str(int(maf * 100)) + '-K=' + str(K) + '/'
+		filepath = directory + '/file_n=' + str(n) + '-maf=' + str(int(maf * 100)) + '-K=' + str(K) + '/'
 		#open file for simulation
 		maf_formated = maf * 100
 		filename_simulation = 'simulation' + str(trial_number) + '_n=' + str(n) + '-maf=' + str(int(maf_formated)) + '-K=' + str(K) + '.txt'
@@ -95,8 +95,8 @@ def printFScore(n, K, maf):
 			myfile.write(str(simulation_result[i][1]))
 			myfile.write('\n')
 
-def precisionRecallSetup(n, K, maf):
-	filepath = '/home/jiahuang/Dropbox/Princeton/Sophomore Summer/Summer Project/Summer2016/New Simulation Result/file_n=' + str(n) + '-maf=' + str(int(maf * 100)) + '-K=' + str(K) + '/'
+def precisionRecallSetup(n, K, maf, directory):
+	filepath = directory + '/file_n=' + str(n) + '-maf=' + str(int(maf * 100)) + '-K=' + str(K) + '/'
 	#open file for simulation
 	precisionRecall_data = []
 
@@ -131,8 +131,21 @@ def getPrecisionRecallValues(precisionRecall_data, cut_off):
 
 	return [Tp/(Tp + Fp), Tp/(Tp + Fn)]
 
-def plotPrecisionRecall(n, K, maf):
-	precisionRecall_data = precisionRecallSetup(n, K, maf)
+def plotPrecisionRecall(n, K, maf, directory):
+	filepath = directory + '/file_n=' + str(n) + '-maf=' + str(int(maf * 100)) + '-K=' + str(K) + '/'
+	filename_specification = 'specification' + '_n=' + str(n) + '-maf=' + str(int(maf * 100)) + '-K=' + str(K) + '.txt'
+	with open(filepath + filename_specification) as myfile:
+		beta_0k = []
+		beta_k = []
+		for i, line in enumerate(myfile):
+			if i >= 1 and i <= K:
+				raw_data = map(float, line.split())
+				beta_0k.append(raw_data[1])
+			if i >= K+3 and i <= 2*K+2:
+				raw_data = map(float, line.split())
+				beta_k.append(raw_data[1])
+
+	precisionRecall_data = precisionRecallSetup(n, K, maf, directory)
 	precision_list = []
 	recall_list = []
 	for i in range(1, len(precisionRecall_data)):
@@ -144,6 +157,8 @@ def plotPrecisionRecall(n, K, maf):
 	plt.ylabel('Precision')
 	plt.xlabel('Recall')
 	plt.axis([0, 1.0, 0, 1.0])
+	plt.figtext(.15, .3, "Intercept:" + " ".join(str(x) for x in beta_0k))
+	plt.figtext(.15, .25, "Effect:" + " ".join(str(x) for x in beta_k))
 	plt.savefig(str(n) + ' individuals, ' + str(K) +  ' isoforms, ' + str(maf) + ' maf' + '.png')
 	plt.close()
 	#plt.show()
@@ -152,16 +167,17 @@ n = [10, 100]
 maf = [0.05, 0.1, 0.2]
 K = [3, 5]
 
+directory = '/home/jiahuang/Dropbox/Princeton/Sophomore Summer/Summer Project/Summer2016/Oct27Result/Int-non-zero-Eff-non-zero'
+
 """
 for n_item in n:
 	for maf_item in maf:
 		for K_item in K:
-			printFScore(n_item, K_item, maf_item)
+			printFScore(n_item, K_item, maf_item, directory)
 """
-"""
+
+
 for n_item in n:
 	for maf_item in maf:
 		for K_item in K:
-			plotPrecisionRecall(n_item, K_item, maf_item)
-"""
-plotPrecisionRecall(100, 5, 0.2)
+			plotPrecisionRecall(n_item, K_item, maf_item, directory)

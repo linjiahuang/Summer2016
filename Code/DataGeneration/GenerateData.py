@@ -108,8 +108,7 @@ def generate_random_data(beta_0k, epsilon_j_k):
 		Isoform.append((np.random.dirichlet(arrayEta).tolist()))
 	return Isoform
 
-def create_folders():
-	directory = '/home/jiahuang/Dropbox/Princeton/Sophomore Summer/Summer Project/Summer2016/New Simulation Result'
+def create_folders(directory):
 	n = [10, 100]
 	maf = [0.05, 0.1, 0.2]
 	K = [3, 5]
@@ -121,13 +120,13 @@ def create_folders():
 				os.mkdir(new_directory)
 
 #For 2 files(null and alternative) in 1 folder
-def print_data(trial_number, n, K, maf, beta_0k, beta_k):
+def print_data(trial_number, n, K, maf, beta_0k, beta_k, directory):
 	#generate appropriate data
 	gene_data = generate_gene_data(n, maf)
 	epsilon_j_k = generate_epsilon_j_k(sigma_1, n, K)
 	Isoform = generate_correlated_data(gene_data, beta_0k, beta_k, epsilon_j_k)
 
-	filepath = '/home/jiahuang/Dropbox/Princeton/Sophomore Summer/Summer Project/Summer2016/New Simulation Result/file_n=' + str(n) + '-maf=' + str(int(maf * 100)) + '-K=' + str(K) + '/'
+	filepath = directory + '/file_n=' + str(n) + '-maf=' + str(int(maf * 100)) + '-K=' + str(K) + '/'
 
 	#open file for simulation
 	maf_formated = maf * 100
@@ -159,7 +158,10 @@ def print_data(trial_number, n, K, maf, beta_0k, beta_k):
 		nullSimulation.write('\n')
 	nullSimulation.close()
 
-def print_all_data():
+#directory is directory of folder to put data file in
+#beta_0k is non-zero iff intercept is true
+#beta_k is non-zero iff effect is true
+def print_all_data(directory, intercept, effect):
 	n = [10, 100]
 	maf = [0.05, 0.1, 0.2]
 	K = [3, 5]
@@ -168,11 +170,18 @@ def print_all_data():
 		for maf_item in maf:
 			for K_item in K:
 				#generate the intercept value (beta_0k) and the effect value (beta_k)
-				beta_0k = generate_beta_0k(lower_bound, upper_bound, K_item)
-				beta_k = generate_beta_k(sigma_0, K_item)
+				if intercept:
+					beta_0k = generate_beta_0k(lower_bound, upper_bound, K_item)
+				else:
+					beta_0k = [0] * K_item
+				if effect:
+					beta_k = generate_beta_k(sigma_0, K_item)
+				else:
+					beta_k = [0] * K_item
+
 				#opens files for specification
 				maf_formated = maf_item * 100
-				filepath = '/home/jiahuang/Dropbox/Princeton/Sophomore Summer/Summer Project/Summer2016/New Simulation Result/file_n=' + str(n_item) + '-maf=' + str(int(maf_item * 100)) + '-K=' + str(K_item) + '/'
+				filepath = directory + '/file_n=' + str(n_item) + '-maf=' + str(int(maf_item * 100)) + '-K=' + str(K_item) + '/'
 				filename_specification = 'specification' + '_n=' + str(n_item) + '-maf=' + str(int(maf_formated)) + '-K=' + str(K_item) + '.txt'
 				specification = open(filepath + filename_specification, 'w')
 				specification.write('Values used for beta_0k(intercept). Sampled from {0} to {1} uniformly:\n'.format(lower_bound, upper_bound))
@@ -186,13 +195,37 @@ def print_all_data():
 					specification.write('\n')
 				specification.close()
 				for i in range(0, 500):
-					print_data(i+1, n_item, K_item, maf_item, beta_0k, beta_k)
+					print_data(i+1, n_item, K_item, maf_item, beta_0k, beta_k, directory)
 
-create_folders()
-print_all_data()
+#for creating folder
+"""
+folder_directory = '/home/jiahuang/Dropbox/Princeton/Sophomore Summer/Summer Project/Summer2016/Oct27Result/Int-zero-Eff-zero'
+create_folders(folder_directory)
 
+folder_directory = '/home/jiahuang/Dropbox/Princeton/Sophomore Summer/Summer Project/Summer2016/Oct27Result/Int-non-zero-Eff-zero'
+create_folders(folder_directory)
 
+folder_directory = '/home/jiahuang/Dropbox/Princeton/Sophomore Summer/Summer Project/Summer2016/Oct27Result/Int-zero-Eff-non-zero'
+create_folders(folder_directory)
 
+folder_directory = '/home/jiahuang/Dropbox/Princeton/Sophomore Summer/Summer Project/Summer2016/Oct27Result/Int-non-zero-Eff-non-zero'
+create_folders(folder_directory)
+"""
+
+#for creating files
+"""
+file_directory = '/home/jiahuang/Dropbox/Princeton/Sophomore Summer/Summer Project/Summer2016/Oct27Result/Int-non-zero-Eff-non-zero'
+print_all_data(file_directory, True, True)
+
+file_directory = '/home/jiahuang/Dropbox/Princeton/Sophomore Summer/Summer Project/Summer2016/Oct27Result/Int-non-zero-Eff-zero'
+print_all_data(file_directory, True, False)
+
+file_directory = '/home/jiahuang/Dropbox/Princeton/Sophomore Summer/Summer Project/Summer2016/Oct27Result/Int-zero-Eff-non-zero'
+print_all_data(file_directory, False, True)
+
+file_directory = '/home/jiahuang/Dropbox/Princeton/Sophomore Summer/Summer Project/Summer2016/Oct27Result/Int-zero-Eff-zero'
+print_all_data(file_directory, False, False)
+"""
 
 
 
